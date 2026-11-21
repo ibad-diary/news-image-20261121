@@ -128,8 +128,6 @@ def icon(d, kind, x0, y0, x1, y1):
         d.ellipse([cx - 4, cy + 18, cx + 4, cy + 26], fill=RED)
     elif kind == "server":
         d.rectangle([x0, y0, x1, y1], fill=(30, 40, 56))
-        for i, yy in enumerate((y0 + 6, y0 + 16, y0 + 26)):
-            pass
         for i in range(3):
             yy = y0 + 5 + i * 11
             d.rectangle([cx - 34, yy, cx + 34, yy + 8], outline=(150, 170, 200), width=1)
