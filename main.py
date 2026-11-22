@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
-"""Entry point: render the front page and place it where make.fun expects.
+"""Entry point: copy the pre-rendered front page to the output directory.
 
-Builds entry.png with generate_image.py (PIL, build-time only), then copies
-it to $MAKEFUN_OUTPUT_DIR/entry.png and verifies the result: PNG magic,
-size at most 1 MiB, and 1024x1024 pixels. Deterministic: running this
-script twice writes byte-identical files.
+Copies entry.png (rendered at build time by generate_image.py, PIL) to
+$MAKEFUN_OUTPUT_DIR/entry.png and verifies the result: PNG magic,
+size at most 1 MiB, and 1024x1024 pixels. Deterministic: the output
+is a byte-identical copy of the committed entry.png.
 """
 import hashlib
 import os
 import shutil
 import struct
-import subprocess
-import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 MAX_BYTES = 1024 * 1024
@@ -29,8 +27,6 @@ def png_dimensions(path):
 
 
 def main():
-    subprocess.run([sys.executable, os.path.join(HERE, "generate_image.py")],
-                   check=True)
     src = os.path.join(HERE, "entry.png")
     out_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
     os.makedirs(out_dir, exist_ok=True)
