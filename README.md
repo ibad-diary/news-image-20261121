@@ -6,6 +6,8 @@
 
 A one-page newspaper front page summing up Saturday, 21 November 2026 in a single image: 37 stories (3 illustrated leads, 10 illustrated features, 24 one-line briefs), a numbers strip, and a date-check footer that explicitly excludes stories first reported on Friday 20 November (Cyclone Akvan's landfall, the Trump–Xi–Putin Shenzhen summit, Anthropic's $83 IPO debut, the ICJ Myanmar verdict, GTA VI launch). Every picture is drawn in code.
 
+Round 3 vs round 2: the Saturday-night Iran strike on US bases in Bahrain becomes lead 2 (shown as a CLAIM — Tehran says it hit US radars, Bahrain says only a civilian site burned); the Russian ship Sparta II ablaze in the Gulf of Finland and the capture of FBI most-wanted 'Chapo Isidro' become features; the Riyadh missile defence moves to the briefs; regions split to ten (North/South America, East/SE/South Asia); feature pictures grow taller and map dots are spread so neighbours stop colliding.
+
 ## Run it
 
 ```sh

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-"""Entry point for the news-image-20261121 round-2 program.
+"""Entry point for the news-image-20261121 round-3 program.
 
 Copies the pre-rendered front page (entry.png, in this repository) to
 $MAKEFUN_OUTPUT_DIR/entry.png and verifies the output: PNG magic bytes,

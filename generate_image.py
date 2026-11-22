@@ -1,10 +1,15 @@
 # SPDX-License-Identifier: MIT
-"""Draw the news-image-20261121 round-2 front page (1024x1024, PIL, stdlib only).
+"""Draw the news-image-20261121 round-3 front page (1024x1024, PIL, stdlib only).
 
 Original code-drawn newspaper front page: masthead, six-number strip,
-region chips, three illustrated leads, ten illustrated features, a coded
-world dot-map with numbered story points, a numbered brief list, and a
-date-check box. All text comes from stories.json next to this file.
+ten region chips, three illustrated leads, ten illustrated features with
+taller picture bands, a coded world dot-map with spread-out numbered story
+points, a numbered brief list, and a date-check box. All text comes from
+stories.json next to this file. Round 3 vs round 2: the Saturday-night
+Bahrain strike becomes lead 2, the Sparta II fire and the Chapo Isidro
+capture become features, Riyadh moves to the briefs, regions split to ten
+(North/South America, East/SE/South Asia), feature pictures grow from
+30 px to 44 px tall, and map dots are spread so neighbours stop colliding.
 """
 import json
 import math
@@ -71,17 +76,42 @@ def icon(d, kind, x0, y0, x1, y1):
     w, h = x1 - x0, y1 - y0
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
     if kind == "globe":
+        # Earth: blue disc, meridian + parallel lines, green land blobs,
+        # red day-count badge at upper right.
         d.rectangle([x0, y0, x1, y1], fill=SKY)
-        d.ellipse([cx - 30, cy - 26, cx + 6, cy + 26], outline=NAVY, width=2)
-        d.ellipse([cx - 30, cy - 26, cx + 6, cy + 26], fill=(120, 180, 210))
-        d.arc([cx - 30, cy - 26, cx + 6, cy + 26], 300, 60, fill=NAVY, width=1)
-        d.line([cx - 30, cy, cx + 6, cy], fill=NAVY, width=1)
-        d.ellipse([cx - 12, cy - 26, cx - 12, cy + 26], outline=NAVY, width=1)
-        d.rectangle([cx + 16, cy - 22, cx + 24, cy + 22], outline=RED, width=2)
-        d.rectangle([cx + 18, cy + 2, cx + 22, cy + 20], fill=RED)
-        d.ellipse([cx + 14, cy + 16, cx + 26, cy + 28], fill=RED)
-        d.line([cx + 20, cy - 30, cx + 20, cy - 22], fill=(200, 120, 40), width=3)
-        d.ellipse([cx + 14, cy - 36, cx + 26, cy - 24], fill=(240, 180, 60))
+        d.ellipse([cx - 34, cy - 30, cx + 34, cy + 30], fill=(120, 180, 210),
+                  outline=NAVY, width=2)
+        d.ellipse([cx - 12, cy - 30, cx + 12, cy + 30], outline=NAVY, width=1)
+        d.line([cx - 34, cy, cx + 34, cy], fill=NAVY, width=1)
+        d.arc([cx - 34, cy - 30, cx + 34, cy + 30], 200, 340, fill=NAVY, width=1)
+        d.ellipse([cx - 26, cy - 20, cx - 8, cy - 6], fill=(90, 160, 90))
+        d.ellipse([cx + 2, cy + 4, cx + 22, cy + 20], fill=(90, 160, 90))
+        d.ellipse([cx - 6, cy - 26, cx + 8, cy - 14], fill=(90, 160, 90))
+        d.ellipse([cx + 30, cy - 34, cx + 52, cy - 12], fill=RED)
+        d.text((cx + 41, cy - 29), "13", font=font(SANS_B, 13),
+               fill=(255, 255, 255), anchor="ma")
+    elif kind == "blast":
+        # Night sky, missile trails converging on an orange blast starburst.
+        d.rectangle([x0, y0, x1, y1], fill=NAVY)
+        for sx, sy in [(x0 + 20, y0 + 14), (x0 + 90, y0 + 8), (x0 + 160, y0 + 20),
+                       (x0 + 240, y0 + 10), (x0 + 290, y0 + 22)]:
+            d.ellipse([sx, sy, sx + 2, sy + 2], fill=(255, 255, 255))
+        for bx in [x0 + 10, x0 + 55, x0 + 105, x0 + 150, x0 + 200, x0 + 250, x0 + 295]:
+            bh = 18 + ((bx * 7) % 22)
+            d.rectangle([bx, y1 - bh, bx + 22, y1], fill=(12, 20, 36))
+        pts = []
+        for k in range(12):
+            ang = math.pi * k / 6
+            r = 30 if k % 2 == 0 else 13
+            pts.append((cx + r * math.cos(ang), cy + r * math.sin(ang)))
+        d.polygon(pts, fill=(255, 140, 40))
+        d.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(255, 220, 90))
+        for (sx, sy, ex, ey) in [
+                (x0 + 30, y0 + 68, cx - 24, cy + 6),
+                (x1 - 30, y0 + 72, cx + 24, cy + 4),
+                (x0 + 150, y0 + 78, cx, cy + 26)]:
+            d.line([sx, sy, ex, ey], fill=(255, 200, 90), width=2)
+            d.ellipse([sx - 2, sy - 2, sx + 2, sy + 2], fill=(255, 255, 255))
     elif kind == "missiles":
         d.rectangle([x0, y0, x1, y1], fill=NAVY)
         for sx, sy in [(x0 + 20, y0 + 14), (x0 + 90, y0 + 8), (x0 + 160, y0 + 20),
@@ -149,6 +179,28 @@ def icon(d, kind, x0, y0, x1, y1):
         for wx in range(-40, 41, 16):
             d.ellipse([cx + wx, cy - 3, cx + wx + 5, cy + 2], fill=NAVY)
         d.line([x0 + 8, y1 - 8, x1 - 8, y1 - 8], fill=(120, 140, 120), width=2)
+    elif kind == "ship":
+        # Cargo ship on a grey-blue sea, orange flames above the hold.
+        d.rectangle([x0, y0, x1, y1], fill=(200, 216, 226))
+        d.polygon([(cx - 62, cy + 2), (cx + 62, cy + 2), (cx + 48, cy + 18),
+                   (cx - 48, cy + 18)], fill=(40, 50, 66))
+        d.rectangle([cx - 40, cy - 12, cx - 6, cy + 2], fill=(220, 220, 220))
+        d.rectangle([cx + 8, cy - 8, cx + 34, cy + 2], fill=(180, 60, 40))
+        d.polygon([(cx - 18, cy - 12), (cx - 8, cy - 26), (cx + 2, cy - 12)],
+                  fill=(255, 140, 40))
+        d.polygon([(cx + 6, cy - 12), (cx + 16, cy - 28), (cx + 26, cy - 12)],
+                  fill=(255, 200, 60))
+        d.line([x0 + 6, y1 - 6, x1 - 6, y1 - 6], fill=NAVY, width=2)
+        d.line([x0 + 20, y1 - 12, x1 - 20, y1 - 12], fill=(140, 160, 180), width=1)
+    elif kind == "cuffs":
+        # Two steel handcuff rings joined by a short chain, on pale paper.
+        d.rectangle([x0, y0, x1, y1], fill=(240, 238, 228))
+        d.ellipse([cx - 48, cy - 14, cx - 16, cy + 18], outline=NAVY, width=4)
+        d.ellipse([cx + 16, cy - 14, cx + 48, cy + 18], outline=NAVY, width=4)
+        d.line([cx - 16, cy + 2, cx + 16, cy + 2], fill=NAVY, width=3)
+        d.ellipse([cx - 4, cy - 2, cx + 4, cy + 6], outline=NAVY, width=2)
+        d.rectangle([cx - 48, cy - 16, cx - 34, cy - 8], fill=RED)
+        d.rectangle([cx + 34, cy - 16, cx + 48, cy - 8], fill=RED)
     elif kind == "nodes":
         d.rectangle([x0, y0, x1, y1], fill=(232, 238, 244))
         pts = [(cx - 50, cy - 10), (cx - 16, cy + 8), (cx + 18, cy - 12), (cx + 52, cy + 6)]
@@ -250,7 +302,7 @@ def build(data, out_path):
     f_lead_s = font(SANS, 10)
     f_tag = font(SANS, 8)
     f_tag_b = font(SANS_B, 8)
-    f_feat_t = font(SANS_B, 10)
+    f_feat_t = font(SANS_B, 11)
     f_feat_s = font(SANS, 9)
     f_sec = font(SANS_B, 11)
     f_brief = font(SANS, 9)
@@ -282,7 +334,7 @@ def build(data, out_path):
         d.text((x + bw / 2, y0 + 7), num["value"], font=f_num_v, fill=INK, anchor="ma")
         d.text((x + bw / 2, y0 + 29), num["label"], font=f_num_l, fill=MUTED, anchor="ma")
 
-    # ---- region chips
+    # ---- region chips (ten, short labels so one row still fits)
     y0 = 170
     chips = ["%s %d" % (name, n) for name, n in data["regions"]]
     widths = [f_chip.getlength(c) + 18 for c in chips]
@@ -313,32 +365,32 @@ def build(data, out_path):
         tag = "%s - %s - %s" % (lead["source"], lead["time"], lead["status"])
         d.text((x + 7, y0 + lh - 14), tag, font=f_tag_b, fill=RED)
 
-    # ---- features (two rows of five)
+    # ---- features (two rows of five; taller picture band than round 2)
     fw = (CW - 4 * 6) / 5
-    fh = 98
+    fh = 110
     for row in range(2):
         y0 = 420 + row * (fh + 6)
         for col in range(5):
             feat = data["features"][row * 5 + col]
             x = M + col * (fw + 6)
             d.rectangle([x, y0, x + fw, y0 + fh], outline=LINE, width=1)
-            icon(d, feat["icon"], x + 1, y0 + 1, x + fw - 1, y0 + 30)
-            ty = y0 + 33
-            for ln in wrap(feat["title"], f_feat_t, fw - 10):
+            icon(d, feat["icon"], x + 1, y0 + 1, x + fw - 1, y0 + 45)
+            ty = y0 + 48
+            for ln in wrap(feat["title"], f_feat_t, fw - 10)[:2]:
                 d.text((x + 5, ty), ln, font=f_feat_t, fill=INK)
-                ty += 12
-            for ln in wrap(feat["summary"], f_feat_s, fw - 10):
+                ty += 13
+            for ln in wrap(feat["summary"], f_feat_s, fw - 10)[:2]:
                 d.text((x + 5, ty), ln, font=f_feat_s, fill=(40, 38, 34))
                 ty += 11
             tag = "%s - %s - %s" % (feat["source"], feat["time"], feat["status"])
             d.text((x + 5, y0 + fh - 11), tag, font=f_tag, fill=RED)
 
     # ---- map
-    d.text((M, 626), "WHERE IT HAPPENED  -  37 PLACES, NUMBERED",
+    d.text((M, 652), "WHERE IT HAPPENED  -  37 PLACES, NUMBERED",
            font=f_sec, fill=INK)
-    d.text((W - M, 628), "Numbers match the list below",
+    d.text((W - M, 654), "Numbers match the list below",
            font=f_tiny, fill=MUTED, anchor="ra")
-    mx0, my0, mx1, my1 = M, 644, W - M, 758
+    mx0, my0, mx1, my1 = M, 668, W - M, 762
     d.rectangle([mx0, my0, mx1, my1], fill=SEA, outline=LINE, width=1)
 
     def proj(lon, lat):
@@ -354,20 +406,20 @@ def build(data, out_path):
         px, py = proj(p["x"], p["y"])
         px += p.get("dx", 0)
         py += p.get("dy", 0)
-        d.ellipse([px - 7, py - 7, px + 7, py + 7], fill=RED,
+        d.ellipse([px - 6, py - 6, px + 6, py + 6], fill=RED,
                   outline=(255, 255, 255), width=1)
         d.text((px, py - 4), str(p["n"]), font=f_tag_b, fill=(255, 255, 255),
                anchor="ma")
 
     # ---- briefs
-    d.text((M, 766), "ALSO ON SATURDAY 21 NOVEMBER 2026  -  24 MORE STORIES",
+    d.text((M, 770), "ALSO ON SATURDAY 21 NOVEMBER 2026  -  24 MORE STORIES",
            font=f_sec, fill=INK)
     colw = (CW - 16) / 2
     for idx, b in enumerate(data["briefs"]):
         col = idx // 12
         row = idx % 12
         x = M + col * (colw + 16)
-        y = 784 + row * 13
+        y = 786 + row * 13
         head = "%d  %s - " % (b["n"], b["place"].upper())
         d.text((x, y), head, font=f_brief_b, fill=RED)
         tx = x + f_brief_b.getlength(head)
@@ -375,7 +427,7 @@ def build(data, out_path):
         d.text((tx, y), rest, font=f_brief, fill=INK)
 
     # ---- date check + footer
-    y0 = 944
+    y0 = 948
     d.rectangle([M, y0, W - M, y0 + 34], fill=(255, 240, 240), outline=RED, width=1)
     dc = wrap(data["date_check"], f_small, CW - 16)
     yy = y0 + 3
